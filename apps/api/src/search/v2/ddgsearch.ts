@@ -1,9 +1,7 @@
-import * as undici from "undici";
 import { config } from "../../config";
 import { JSDOM } from "jsdom";
 import { SearchV2Response, WebSearchResult } from "../../lib/entities";
 import { logger } from "../../lib/logger";
-import { getSecureDispatcher } from "../../scraper/scrapeURL/engines/utils/safeFetch";
 
 class DDGAntiBotError extends Error {
   constructor() {
@@ -143,13 +141,12 @@ export async function ddgSearch(
       }, timeout);
 
       try {
-        let response: undici.Response;
+        let response: Response;
 
         if (isFirstPage) {
-          response = await undici.fetch(
+          response = await fetch(
             `https://html.duckduckgo.com/html?${params.toString()}`,
             {
-              dispatcher: getSecureDispatcher(false),
               redirect: "follow",
               headers: {
                 "User-Agent": userAgent,
@@ -163,10 +160,9 @@ export async function ddgSearch(
             },
           );
         } else {
-          response = await undici.fetch(`https://html.duckduckgo.com/html`, {
+          response = await fetch(`https://html.duckduckgo.com/html`, {
             method: "POST",
             body: nextPageData.toString(),
-            dispatcher: getSecureDispatcher(false),
             redirect: "follow",
             headers: {
               "User-Agent": userAgent,
